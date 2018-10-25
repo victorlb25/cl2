@@ -1,0 +1,42 @@
+module Lista2Ex5(
+  input CLOCK_50,    //    50 MHz clock  
+  input [5:0]SW,
+//    LCD Module 16X2
+  output LCD_ON,    // LCD Power ON/OFF
+  output LCD_BLON,    // LCD Back Light ON/OFF
+  output LCD_RW,    // LCD Read/Write Select, 0 = Write, 1 = Read
+  output LCD_EN,    // LCD Enable
+  output LCD_RS,    // LCD Command/Data Select, 0 = Command, 1 = Data
+  inout [7:0] LCD_DATA    // LCD Data bus 8 bits    
+);
+
+// reset delay gives some time for peripherals to initialize
+wire DLY_RST;
+
+reg [2:0] week_state = 3'd0;
+
+LCD_Reset_Delay r0(.iCLK(CLOCK_50),.FORCE_RESET(SW),.oRESET(DLY_RST));
+
+assign LED0 = DLY_RST;
+
+// turn LCD ON
+assign    LCD_ON        =    1'b1;
+assign    LCD_BLON    =    1'b1;
+
+
+
+LCD_CONTENT u1(
+// Host Side - i.e., what is provided to the module by the FPGA kit
+   //ADD HERE AN INPUT SIGN FOR THE STATE TO BE DISPLAYED
+   .iCLK(CLOCK_50),
+   .iRST_N(DLY_RST),
+	.week_state(week_state),
+// LCD Side - i.e., what the module provides to the LCD
+   .LCD_DATA(LCD_DATA),
+   .LCD_RW(LCD_RW),
+   .LCD_EN(LCD_EN),
+   .LCD_RS(LCD_RS)
+);
+
+
+endmodule
